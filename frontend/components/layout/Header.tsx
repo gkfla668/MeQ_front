@@ -7,13 +7,13 @@ const MenuItem = styled.li<{ active: boolean }>`
   justify-content: center;
   align-items: center;
 
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: ${props => (props.active ? "white" : "#ff7f00")};
   background-color: ${props => props.active && "#ff7f00"};
   border-radius: 8rem;
 
-  width: 20.8rem;
+  width: 16rem;
   white-space: nowrap;
   cursor: pointer;
 `;
@@ -23,7 +23,7 @@ const UserItem = styled.li<{ active: boolean }>`
   justify-content: center;
   align-items: center;
 
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
 
   width: 12.8rem;
@@ -40,13 +40,13 @@ const Header = () => {
   const router = useRouter();
 
   return (
-    <div className="py-[2.4rem]">
+    <div className="py-[2.8rem]">
       <div className="flex justify-center items-center">
         <div className="ml-[8rem] mr-[5.2rem]">
           <LogoSVG />
         </div>
         <div className="w-full">
-          <nav className="flex justify-between items-center bg-[#ffedc8] rounded-l-[8rem] h-[6rem]">
+          <nav className="flex justify-between items-center bg-[#ffedc8] rounded-l-[8rem] h-[5rem]">
             <ul className="flex h-full">
               <MenuItem
                 active={router.pathname === "/"}

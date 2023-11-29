@@ -52,7 +52,7 @@ const Login = () => {
   };
 
   return (
-    <div className="w-[36rem] pt-[1rem]">
+    <div className="w-[32rem] pt-[1rem]">
       <div className="flex flex-col justify-center items-center">
         <IconLogoSVG />
         <TextLogoSVG />
