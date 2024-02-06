@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import { toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 import * as S from "./style";
+import { API } from "../api/api";
 
-const Register = () => {
+const SignupPage = () => {
   const [identity, setIdentity] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -33,15 +36,17 @@ const Register = () => {
     setName(userInput);
   };
 
-  const apiInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API,
-    headers: {
-      "Content-Type": "application/json",
-      // 다른 헤더 설정
-    },
-  });
-
   const onSubmit = async () => {
+    if (
+      identity.length == 0 ||
+      password.length == 0 ||
+      name.length == 0 ||
+      birthYear.length == 0 ||
+      birthMonth.length == 0 ||
+      birthDay.length == 0
+    )
+      return;
+
     const userData = {
       membersId: identity,
       password: password,
@@ -50,17 +55,35 @@ const Register = () => {
       birth: birthYear + birthMonth + birthDay,
     };
     try {
-      const response = await apiInstance.post(
+      const response = await API.post(
         "/api/v1/members",
         JSON.stringify(userData),
       );
+
       if (response.status === 200) {
-        alert("회원가입에 성공하였습니다.");
+        toast.success("회원가입에 성공하였습니다.");
 
         router.push("/login");
       } else {
-        alert("회원가입 실패");
-        console.error("회원 가입 실패");
+        toast.error("회원가입에 실패하였습니다.");
+      }
+    } catch (error) {
+      console.error("API 요청 중 오류 발생:", error);
+    }
+  };
+
+  const onConfirmId = async () => {
+    try {
+      const response = await API.get(`/api/v1/members/duplicate/${identity}`);
+
+      if (response.status === 200) {
+        if (response.data.responseData) {
+          toast.error("중복된 아이디입니다.");
+          setIdentity("");
+        }
+      } else {
+        toast.error("중복 확인에 실패하였습니다.");
+        console.error("중복확인 실패");
       }
     } catch (error) {
       console.error("API 요청 중 오류 발생:", error);
@@ -68,30 +91,38 @@ const Register = () => {
   };
 
   return (
-    <form
-      className="w-[52rem] flex flex-col justify-center items-center pt-[1rem]"
-      action={"#"}
-    >
+    <div className="w-[52rem] flex flex-col justify-center items-center pt-[1rem]">
       <div className="text-[2.4rem] font-bold mb-[2rem]">회원가입</div>
-      <S.Wrapper>
+      <S.Wrapper id="signupForm">
         <div className="flex flex-col items-start gap-[1rem]">
-          <div className="flex gap-[1.6rem] item-center justify-center">
+          <div className="flex gap-[1.2rem] item-center justify-center">
             <S.Title>아이디</S.Title>
             <S.Text>
               5 - 20자의 영문 소문자, 숫자를 조합하여 입력해 주세요.
             </S.Text>
           </div>
-          <S.Input
-            value={identity}
-            type="text"
-            maxLength={20}
-            minLength={5}
-            required
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangeId(e)}
-          />
+          <div className="flex gap-4 justify-between items-center w-full">
+            <S.Input
+              value={identity}
+              type="text"
+              maxLength={20}
+              minLength={5}
+              required
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChangeId(e)
+              }
+              autoFocus
+            />
+            <button
+              onClick={onConfirmId}
+              className="whitespace-nowrap border-[1px] rounded-full px-8 py-3 border-[#ff7f00] text-[#ff7f00] hover:text-white hover:bg-[#ff7f00] text-[1.3rem]"
+            >
+              중복 확인
+            </button>
+          </div>
         </div>
         <div className="flex flex-col items-start gap-[1rem]">
-          <div className="flex gap-[2rem]">
+          <div className="flex gap-[1.2rem]">
             <S.Title>비밀번호</S.Title>
             <S.Text>
               8 - 16자의 영문 대/소문자, 숫자를 조합하여 입력해 주세요.
@@ -132,7 +163,9 @@ const Register = () => {
                 onChange={() => setSex("M")}
                 checked
               />
-              <S.RadioLabel htmlFor="radio-1">남성</S.RadioLabel>
+              <S.RadioLabel className="text-[1.2rem]" htmlFor="radio-1">
+                남성
+              </S.RadioLabel>
 
               <S.RadioInput
                 type="radio"
@@ -141,7 +174,9 @@ const Register = () => {
                 id="radio-2"
                 onChange={() => setSex("F")}
               />
-              <S.RadioLabel htmlFor="radio-2">여성</S.RadioLabel>
+              <S.RadioLabel className="text-[1.2rem]" htmlFor="radio-2">
+                여성
+              </S.RadioLabel>
 
               <S.RadioInput
                 type="radio"
@@ -150,7 +185,9 @@ const Register = () => {
                 id="radio-3"
                 onChange={() => setSex("E")}
               />
-              <S.RadioLabel htmlFor="radio-3">기타</S.RadioLabel>
+              <S.RadioLabel className="text-[1.2rem]" htmlFor="radio-3">
+                기타
+              </S.RadioLabel>
             </div>
           </div>
         </div>
@@ -191,6 +228,7 @@ const Register = () => {
         </div>
       </S.Wrapper>
       <S.Button
+        type="submit"
         active={
           identity.length !== 0 &&
           password.length !== 0 &&
@@ -203,8 +241,8 @@ const Register = () => {
       >
         회원가입
       </S.Button>
-    </form>
+    </div>
   );
 };
 
-export default Register;
+export default SignupPage;
