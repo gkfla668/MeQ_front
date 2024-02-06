@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.form`
   position: relative;
   width: 100%;
 
@@ -24,7 +24,7 @@ export const Button = styled.button<{ active: boolean }>`
 
   padding: 1.4rem 0;
   margin: 2rem;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: ${props => (props.active ? "white" : "#ff7f00")};
   border-radius: 8rem;
