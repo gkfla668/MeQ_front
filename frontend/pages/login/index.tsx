@@ -3,11 +3,14 @@ import IconLogoSVG from "public/assets/iconLogo.svg";
 import TextLogoSVG from "public/assets/textLogo.svg";
 import { useState } from "react";
 import styled from "styled-components";
+import { API } from "../api/api";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Input = styled.input`
   width: 100%;
   font-size: 1.6rem;
-  padding: 1.6rem 3.2rem;
+  padding: 1.4rem 3.2rem;
   border-radius: 8rem;
   border: 2px solid #423227;
 
@@ -26,9 +29,9 @@ const Input = styled.input`
 const Button = styled.button`
   width: 100%;
   border-radius: 8rem;
-  padding: 1.6rem 0;
+  padding: 1.4rem 0;
   margin-bottom: 2rem;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: white;
   background-color: #ff7f00;
@@ -38,21 +41,45 @@ const Button = styled.button`
   }
 `;
 
-const Login = () => {
+const LoginPage = () => {
   const router = useRouter();
 
   const [id, setId] = useState("");
   const [pwd, setPwd] = useState("");
 
   /** Login API */
-  const onSubmit = () => {
-    console.log(id, pwd);
+  const onSubmit = async () => {
+    const userData = {
+      membersId: id,
+      membersPassword: pwd,
+    };
+    try {
+      const response = await API.post(
+        "/api/v1/members/login",
+        JSON.stringify(userData),
+      );
+      if (response.status === 200) {
+        toast.success("로그인에 성공하였습니다.");
+
+        localStorage.setItem(
+          "membersKey",
+          response.data.responseData.membersKey,
+        );
+
+        location.replace("/");
+      } else {
+        toast.error("로그인에 실패하였습니다.");
+        console.error("로그인 실패");
+      }
+    } catch (error) {
+      console.error("API 요청 중 오류 발생:", error);
+    }
 
     // router.push("/");
   };
 
   return (
-    <div className="w-[32rem] pt-[1rem]">
+    <div className="w-[32rem] pt-[3.2rem]">
       <div className="flex flex-col justify-center items-center">
         <IconLogoSVG />
         <TextLogoSVG />
@@ -64,6 +91,7 @@ const Login = () => {
             placeholder="아이디"
             value={id}
             onChange={e => setId(e.target.value)}
+            autoFocus
           />
           <Input
             type="password"
@@ -74,13 +102,13 @@ const Login = () => {
         </div>
         <div className="flex flex-col justify-center items-center w-full">
           <Button onClick={onSubmit}>로그인</Button>
-          <div className="flex justify-center items-center gap-[1.2rem]">
-            <p className="text-[1.4rem] text-[#423227]">
+          <div className="flex justify-center items-center gap-[0.8rem]">
+            <p className="text-[1.3rem] text-[#423227]">
               아직 회원이 아니신가요?
             </p>
             <button
-              onClick={() => router.push("/register")}
-              className="text-[1.6rem] text-[#FF7F00] font-bold "
+              onClick={() => router.push("/signup")}
+              className="text-[1.4rem] text-[#FF7F00] font-bold "
             >
               회원가입
             </button>
@@ -91,4 +119,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;
